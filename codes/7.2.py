@@ -1,35 +1,50 @@
-import numpy as np
+import soundfile as sf
 import matplotlib.pyplot as plt
+from scipy import signal
+import numpy as np
 
-# Given values of r(i), p(i), and k(i)
-r_values = [0.07028132-0.13571006j, 
-            0.07028132+0.13571006j, 
-            -0.05018348+0.01417803j, 
-            -0.05018348-0.01417803j]
+#read .wav file 
+input_signal, fs = sf.read('audiofiltering.wav') 
 
-p_values = [0.78465217+0.0346749j, 
-            0.78465217-0.0346749j, 
-            0.84417798+0.11384352j, 
-            0.84417798-0.11384352j]
+#sampling frequency of Input signal
+sampl_freq = fs
+print(sampl_freq)
 
-k_values = [2.14e-5, 0, 0, 0]
+#order of the filter
+order = 4
 
-# Time indices
-n_values = np.arange(31)  # n values up to 30
+#cutoff frquency 
+cutoff_freq = 1000.0  
 
-# Compute h(n)
-hn_values = np.zeros_like(n_values, dtype=np.complex128)
-for n in n_values:
-    for i in range(len(r_values)):
-        hn_values[n] += r_values[i] * (p_values[i] ** n)
-    for j in range(len(k_values)):
-        if n - j >= 0:
-            hn_values[n] += k_values[j]
+#digital frequency
+Wn = 2 * cutoff_freq / sampl_freq  
 
-# Plot
-plt.stem(n_values, np.abs(hn_values))
-plt.xlabel('$n$')
-plt.ylabel('$|h(n)|$')
-plt.title('Magnitude of $h(n)$')
-plt.grid(True)
-plt.show()
+# b and a are numerator and denominator polynomials respectively
+b, a = signal.butter(order, Wn, 'low') 
+
+# get partial fraction expansion
+r, p, k = signal.residuez(b, a)
+print(r)
+print(p)
+print(k)
+
+
+#number of terms of the impulse response
+sz = 100
+sz_lin = np.arange(sz)
+
+# Vectorized function to compute the impulse response
+def rp_vec(x):
+    return np.sum(r * p**x)
+
+# Apply the vectorized function to sz_lin to compute impulse response
+h1 = np.vectorize(rp_vec)(sz_lin)
+k_add = np.pad(k, (0, sz - len(k)), 'constant', constant_values=(0, 0))
+h = h1 + k_add
+
+# Plotting
+plt.stem(sz_lin, h)
+plt.xlabel('n')
+plt.ylabel('h(n)')
+plt.grid()
+plt.savefig("h(n)_6.2.png")
