@@ -404,7 +404,7 @@ https://github.com/Deepakreddy1510/Audio_filter/blob/main/codes/5.4.py
 %
 \begin{equation}
 \label{eq:convolution}
-y(n) = x(n)*h(n) = \sum_{n=-\infty}^{\infty}x(k)h(n-k)
+y(n) = x(n)*h(n) = \sum_{k=-\infty}^{\infty}x(k)h(n-k)
 \end{equation}
 %
 Comment. The operation in \eqref{eq:convolution} is known as
@@ -427,7 +427,7 @@ https://github.com/Deepakreddy1510/Audio_filter/blob/main/codes/5.5.py
 
 \item Show that
 \begin{equation}
-y(n) =  \sum_{n=-\infty}^{\infty}x(n-k)h(k)
+y(n) =  \sum_{k=-\infty}^{\infty}x(n-k)h(k)
 \end{equation}
 \solution
 In \eqref{eq:convolution}, we substitute $k = n - k$ to get
